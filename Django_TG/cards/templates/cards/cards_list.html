@@ -1,0 +1,40 @@
+<!-- cards_list.html -->
+<h2><img src="{{ expansion.expansion_img.url }}" alt="{{ expansion.expansion_name }}" style="width: 100px; height: auto;"></h2>
+<ul>
+    {% for card in cards %}
+        <li>
+            <img src="{{ card.card_img.url }}" alt="{{ card.card_name }}">
+            <strong>{{ card.card_name }}</strong>
+            <p>Card Number: {{ card.card_number }}</p>
+            {% if user.is_authenticated %}
+            <p>
+                Owned: <input type="checkbox" class="owned-checkbox" data-card-id="{{ card.id }}" {% if user in card.owned_by_users.all %}checked{% endif %}>
+            </p>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+
+<script>
+    $(document).ready(function() {
+        $('.owned-checkbox').change(function() {
+            var cardId = $(this).data('card-id');
+            var isOwned = $(this).is(':checked');
+            $.ajax({
+                url: '{% url "cards:update_owned_status" %}',
+                method: 'POST',
+                data: {
+                    'card_id': cardId,
+                    'owned_by_user': isOwned,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    console.log('Updated successfully');
+                },
+                error: function(response) {
+                    console.error('Error updating status');
+                }
+            });
+        });
+    });
+</script>

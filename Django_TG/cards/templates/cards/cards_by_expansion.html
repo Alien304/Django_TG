@@ -1,0 +1,16 @@
+<!-- cards_by_expansion.html -->
+{% extends 'base_layout.html' %}
+
+{% block content %}
+    <h2>{{ expansion.expansion_name }}</h2>
+    <ul>
+        {% for card in cards %}
+            <li>
+                <img src="{{ card.card_img.url }}" alt="{{ card.card_name }}">
+                <strong>{{ card.card_name }}</strong>
+                <p>Card Number: {{ card.card_number }}</p>
+                <p>Owned: {{ card.owned_by_user }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

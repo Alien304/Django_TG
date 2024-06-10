@@ -1,0 +1,14 @@
+{% extends 'base_layout.html' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block profile_form %}
+    <h2>Edit Profile</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ user_form.as_p }}
+        <h3>Change Password</h3>
+        {{ password_form.as_p }}
+        <button type="submit">Save Changes</button>
+    </form>
+{% endblock %}

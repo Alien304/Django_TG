@@ -1,0 +1,95 @@
+{% load static %}  <!-- Load the static file handling functionality -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Your Site Name{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Add your CSS and JavaScript links here -->
+</head>
+<body>
+<header>
+    <div class="logo">
+        <a href="{% url 'home' %}">
+            <img src="{% static 'assets/logo.png' %}" alt="Your Site Logo">  <!-- Use the static tag for the logo -->
+        </a>
+    </div>
+    <nav>
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <!-- Add more navigation links as needed -->
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'accounts:logout' %}">Logout</a></li>
+                <li><a href="{% url 'accounts:edit_profile' %}">Edit profile</a></li>
+            {% else %}
+                <li><a href="{% url 'accounts:login' %}">Login</a></li>
+                <li><a href="{% url 'accounts:signup' %}">Sign Up</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+<div class="container">
+    <!-- {% block content %} -->
+    <aside class="side-panel">
+        <h3>Choose expansion</h3>
+            <ul>
+                {% for expansion in expansions %}
+                    <li><a href="#" class="expansion-link" data-expansion="{{ expansion.expansion_name }}">
+                        <img src="{{ expansion.expansion_img.url }}" alt="{{ expansion.expansion_name }}" style="width: 100px; height: auto;">
+                    </a>
+                    <!-- <p>{{ expansion.expansion_name }}</p> -->
+                    </li>
+                {% endfor %}
+            </ul>
+    </aside>
+    <div class="content-area-wrapper" id="content-area">
+        <div id="profile-container">
+            {% block profile_form %}
+            <!-- Profile form will be loaded here -->
+            {% endblock %}
+        </div>
+            <!-- Cards will be dynamically loaded here -->
+            <!--<div class="content-area-wrapper empty" id="content-area-empty">
+                <div class="placeholder">
+                </div>
+            </div>-->                          
+    </div>
+    <!-- {% endblock %}  -->
+</div>
+<footer>
+    <p>&copy; 2024 Your Site Name. All rights reserved.</p>
+</footer>
+<script>
+    $(document).ready(function(){
+        $('.expansion-link').click(function(event){
+            event.preventDefault();
+            var expansionName = $(this).data('expansion');
+            $.ajax({
+                url: '{% url "cards:cards_by_expansion_ajax" %}',
+                data: {
+                    'expansion_name': expansionName
+                },
+                success: function(data){
+                    $('#content-area').html(data);
+                    if ($('#content-area ul li').length === 0 && !$('#profile-container').length) {
+                        $('#content-area').addClass('empty');
+                    } else {
+                        $('#content-area').removeClass('empty');
+                    }
+                }
+            });
+        });
+
+        // Check if profile container is present and not empty
+        if ($('#profile-container').length && $('#profile-container').is(':empty')) {
+            $('#content-area-empty').addClass('empty');
+        } else {
+            $('#content-area-empty').removeClass('empty');
+        }
+    });
+</script>
+</body>
+</html>
